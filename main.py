@@ -3,6 +3,7 @@ from sqlalchemy import Column, Float, Integer, Text, String, DateTime, ForeignKe
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from produtos import produtos_bp
+from auth import auth_bp
 from flask_login import LoginManager, UserMixin
 
 #Configurando o Flask.
@@ -63,6 +64,7 @@ def load_user(user_id):
 
 
 app.register_blueprint(produtos_bp)
+app.register_blueprint(auth_bp)
 
 if __name__ == '__main__':
     with app.app_context():
