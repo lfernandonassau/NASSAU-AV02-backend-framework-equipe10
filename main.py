@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from sqlalchemy import Column, Float, Integer, Text, String, DateTime, ForeignKey
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from produtos import produtos_bp
@@ -22,18 +21,18 @@ login_manager.login_view = 'auth.login'
 class Base(db.Model):
     __abstract__ = True 
 
-    created_at = Column(DateTime, default = datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default = datetime.utcnow, onupdate = datetime.utcnow, nullable=False)
-    deleted_at = Column(DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, default = datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default = datetime.utcnow, onupdate = datetime.utcnow, nullable=False)
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
     def soft_delete(self):
         self.deleted_at = datetime.utcnow()
         db.session.commit()
 
-class Usuario(Base):
-    id = Column(Integer, primary_key=True)
-    email = Column(String(100), unique=True, nullable=False)
-    senha_hash = Column(String(100), nullable = False)
+class Usuario(Base, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    senha_hash = db.Column(db.String(100), nullable = False)
 
     pedidos = db.relationship('Pedido', backref='usuario', lazy = True)
 
@@ -41,22 +40,45 @@ class Usuario(Base):
         return f'<Usuario {self.email}>'
 
 class Produto(Base, UserMixin):
-    id = Column(Integer, primary_key=True)
-    nome = Column(String(100), nullable=False)  
-    preco = Column(Float, nullable=False)
-    descricao = Column(Text, nullable=True)   
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)  
+    preco = db.Column(db.Float, nullable=False)
+    descricao = db.Column(db.Text, nullable=True)   
 
     def __repr__(self):
         return f'<Produto {self.nome}>'
 
 class Pedido(Base):
-    id = Column(Integer, primary_key=True)
-    data_pedido = Column(DateTime, default=datetime.utcnow, nullable=False)
-    status = Column(String(50), default='Criado', nullable=False)
-    usuario_id = Column(Integer, ForeignKey('usuario.id'), nullable=False)
-
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False) 
+    data_pedido = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    status = db.Column(db.String(50), default='Criado', nullable=False)
+    valor_total = db.Column(db.Float, default=0.0)
+   
     def __repr__(self):
         return f'<Pedido {self.id}>'
+
+class Loja(Base):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(120), nullable=False)
+    cnpj = db.Column(db.String(18), unique=True, nullbale=False)
+    contato = db.Column(db.String(20), nullable=False)   
+    #Relacionamento 1:N, onde uma loja tem vários produtos.
+    produtos = db.relationship('Produto', backref='loja', lazy=True)
+
+    def __repr__(self):
+        return f'<Loja {self.nome} CNPJ:{self.cnpj}>'
+    
+class Estoque(Base):
+    id = db.Column(db.Integer, primary_key=True)
+    produto_id = db.Column(db.Integer, db.ForeignKey('pedido.id'), unique=True, nullable=False)
+    quantidade = db.Column(db.Integer, default=0, nullable=False)
+    localizacao = db.Column(db.String(100), nullable=False)
+
+    def __repr__(self):
+        return f'<Estoque produto:{self.produto_id} QTD:{self.quantidade}>'
+        
+
     
 @login_manager.user_loader
 def load_user(user_id):
