@@ -1,5 +1,5 @@
-from Flask import Blueprint, request, jsonify
-from app import db, pedido
+from flask import Blueprint, request, jsonify
+from app import db, Pedido
 from flask_login import login_required, current_user
 from datetime import datetime
 
@@ -32,4 +32,8 @@ def create_pedido():
         return jsonify({
             'message': 'Pedido criado com êxito!',
             'pedido': serialize_pedido(novo_pedido)
-        })
+        }), 201
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify ({'message': f'Erro ao criar Pedido:{e}'}), 500
