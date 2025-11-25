@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
-from app import db, Loja # Importar 'db' e a classe 'Loja'
 from datetime import datetime
+from ..extensions import db
+from ..models import Loja
 
 #Blueprint
 loja_bp = Blueprint('loja', __name__, url_prefix='/lojas')
@@ -24,7 +25,7 @@ def criar_loja():
         return jsonify({'message': 'CNPJ e Nome são informações obrigatórias!'})
     
     cnpj = data['cnpj']
-    nome = nome['nome']
+    nome = data['nome']
     contato = contato['contato']
 
     #Verifcação, se o CNPJ é único.

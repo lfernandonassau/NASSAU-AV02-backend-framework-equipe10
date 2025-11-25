@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
-from app import db, Pedido
 from flask_login import login_required, current_user
 from datetime import datetime
+from ..extensions import db
+from ..models import Pedido
 
 pedidos_bp = Blueprint('pedidos', __name__, url_prefix='/pedidos')
 
@@ -18,6 +19,8 @@ def serialize_pedido(pedido):
 @pedidos_bp.route('/', methods=['POST'])
 @login_required #Apenas usuários logados podem fazer pedidos.
 def create_pedido():
+    
+
     data = request.get_json()
 
     novo_pedido = Pedido(

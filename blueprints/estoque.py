@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify
-from app import db, Estoque # Importamos 'db' e a classe 'Estoque'
 from flask_login import login_required 
 from datetime import datetime
+# Este é o caminho correto para subir um nível (..) e acessar a raiz
+from ..extensions import db 
+from ..models import Estoque
 
 # Criação do Blueprint. Todas as rotas começarão com /estoque.
 estoque_bp = Blueprint('estoque', __name__, url_prefix='/estoque')
@@ -21,6 +23,7 @@ def serialize_estoque(estoque):
 @estoque_bp.route('/', methods=['POST'])
 @login_required 
 def criar_estoque():
+
     data = request.get_json()
     
     if not data or 'produto_id' not in data or 'quantidade' not in data:
@@ -57,6 +60,8 @@ def criar_estoque():
 @estoque_bp.route('/', methods=['GET'])
 @login_required
 def listar_estoques():
+    
+
     # Ignora itens deletados logicamente
     estoques = Estoque.query.filter_by(deleted_at=None).all() 
     lista_estoques = [serialize_estoque(e) for e in estoques]
@@ -67,6 +72,8 @@ def listar_estoques():
 #3º Rota: Buscar no estoque.
 @estoque_bp.route('/<int:produto_id>', methods=['GET'])
 def buscar_estoque(produto_id):
+    
+
     # Busca pelo produto_id (e verifica soft delete)
     estoque = Estoque.query.filter(
         Estoque.produto_id == produto_id,
@@ -81,7 +88,9 @@ def buscar_estoque(produto_id):
 #4º Rota: Atualizar estoque.
 @estoque_bp.route('/<int:produto_id>', methods=['PUT'])
 @login_required
+
 def atualizar_estoque(produto_id):
+
     # Busca pelo produto_id (e verifica soft delete)
     estoque = Estoque.query.filter(
         Estoque.produto_id == produto_id,
@@ -118,6 +127,8 @@ def atualizar_estoque(produto_id):
 @estoque_bp.route('/<int:produto_id>', methods=['DELETE'])
 @login_required
 def deletar_estoque(produto_id):
+    
+
     estoque = Estoque.query.filter(
         Estoque.produto_id == produto_id,
         Estoque.deleted_at == None
@@ -133,5 +144,5 @@ def deletar_estoque(produto_id):
         return jsonify({'message': f'Estoque do Produto ID {produto_id} excluído logicamente.'}), 200
         
     except Exception as e:
-        db.session.rollback()
+        db.session.rollback() # type: ignore
         return jsonify({'message': f'Erro ao deletar estoque: {e}'}), 500
