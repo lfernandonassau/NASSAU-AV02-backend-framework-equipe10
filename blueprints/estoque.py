@@ -2,8 +2,8 @@ from flask import Blueprint, request, jsonify
 from flask_login import login_required 
 from datetime import datetime
 # Este é o caminho correto para subir um nível (..) e acessar a raiz
-from ..extensions import db 
-from ..models import Estoque
+from extensions import db 
+from models import Estoque
 
 # Criação do Blueprint. Todas as rotas começarão com /estoque.
 estoque_bp = Blueprint('estoque', __name__, url_prefix='/estoque')

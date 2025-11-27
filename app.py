@@ -57,9 +57,7 @@ def criar_loja_unica():
         print(f"Loja Única '{NOME_LOJA}' já existe.")
 
 
-# ------------------------------------
-# TESTE DO BANCO
-# ------------------------------------
+
 @app.route('/teste-db')
 def teste_db():
     try:
@@ -70,9 +68,7 @@ def teste_db():
         return jsonify({"status": "erro", "mensagem": str(e)}), 500
 
 
-# ------------------------------------
-# IMPORTAÇÃO DOS BLUEPRINTS
-# ------------------------------------
+
 try:
    from blueprints.auth_control import auth_bp
    from blueprints.produtos_controller import produtos_bp
@@ -85,18 +81,14 @@ except ImportError as e:
     print(f"ATENÇÃO: blueprint faltando ou com erro → {e}")
 
 
-# ------------------------------------
-# REGISTRO DOS BLUEPRINTS
-# ------------------------------------
 if 'auth_bp' in locals():      app.register_blueprint(auth_bp)
 if 'produtos_bp' in locals():  app.register_blueprint(produtos_bp)
 if 'pedidos_bp' in locals():   app.register_blueprint(pedidos_bp)
 if 'estoque_bp' in locals():   app.register_blueprint(estoque_bp)
 
 
-# ------------------------------------
-# EXECUÇÃO DO SERVIDOR (Garante que db.create_all() está no contexto)
-# ------------------------------------
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

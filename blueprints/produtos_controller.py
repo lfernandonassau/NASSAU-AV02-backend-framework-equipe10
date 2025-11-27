@@ -2,11 +2,10 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user 
 
-# -------------------------------------------------------------
-# IMPORTAÇÕES CORRETAS (Relativas)
-# -------------------------------------------------------------
-from ..extensions import db
-from ..models import Produto, Loja # Importando Loja para validação
+
+# IMPORTAÇÕES CORRETAS 
+from extensions import db
+from models import Produto, Loja # Importando Loja para validação
 
 # Blueprint de produtos
 produtos_bp = Blueprint('produtos', __name__, url_prefix='/produtos')
@@ -60,7 +59,7 @@ def criar_produtos():
 
 # Função Listar Produtos
 @produtos_bp.route('/', methods=['GET'])
-def listar_produtos():
+def listar_todos_produtos():
     """Lista todos os produtos que não foram deletados (soft delete)."""
     
     # 💡 MELHORIA: Usar .is_(None) é mais legível e idiomático com SQLAlchemy
@@ -78,6 +77,38 @@ def listar_produtos():
             'updated_at': produto.updated_at.isoformat()
         })
     return jsonify(lista), 200
+
+@produtos_bp.route('/loja/<int:loja_id>', methods=['GET'])
+@login_required
+def listar_produtos_por_loja(loja_id): 
+    """Lista todos os produtos de uma loja específica."""
+
+    if current_user.id != loja_id:
+        return jsonify({'message': 'Acesso negado. Você só pode visualizar produtos da sua própria loja.'}), 403
+    
+    loja = Loja.query.get(loja_id)
+    if not loja:
+        return jsonify({'message': f'Loja com ID {loja_id} não encontrada.'}), 404
+        
+    # Filtra produtos APENAS da loja especificada e que não foram eliminados
+    produtos = Produto.query.filter(
+        Produto.loja_id == loja_id, 
+        Produto.deleted_at.is_(None)
+    ).all()
+    
+    produtos_list = [
+        {
+            'id': p.id,
+            'nome': p.nome,
+            'preco': p.preco,
+            'descricao': p.descricao,
+            'loja_id': p.loja_id,
+            'created_at': p.created_at.isoformat(),
+            'updated_at': p.updated_at.isoformat()
+        }
+        for p in produtos
+    ]
+    return jsonify(produtos_list), 200
 
 
 # Função Buscar Produto
@@ -118,6 +149,9 @@ def atualizar_produto(produto_id):
 
     if not produto:
         return jsonify({'message': 'Produto não encontrado para atualização!'}), 400
+
+    if current_user.id != produto.loja.id:
+        return jsonify({'message:' 'Acesso Negado! Apenas é possível atualzar produtos da sua loja!'}), 403
 
     data = request.get_json()
     if not data:
