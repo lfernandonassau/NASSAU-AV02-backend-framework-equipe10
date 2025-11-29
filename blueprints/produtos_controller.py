@@ -75,37 +75,6 @@ def listar_todos_produtos():
         })
     return jsonify(lista), 200
 
-@produtos_bp.route('/loja/<int:loja_id>', methods=['GET'])
-@login_required
-def listar_produtos_por_loja(loja_id): 
-
-    if current_user.id != loja_id:
-        return jsonify({'message': 'Acesso negado. Você só pode visualizar produtos da sua própria loja.'}), 403
-    
-    loja = Loja.query.get(loja_id)
-    if not loja:
-        return jsonify({'message': f'Loja com ID {loja_id} não encontrada.'}), 404
-        
-    # Filtra produtos APENAS da loja especificada e que não foram eliminados
-    produtos = Produto.query.filter(
-        Produto.loja_id == loja_id, 
-        Produto.deleted_at.is_(None)
-    ).all()
-    
-    produtos_list = [
-        {
-            'id': p.id,
-            'nome': p.nome,
-            'preco': p.preco,
-            'descricao': p.descricao,
-            'loja_id': p.loja_id,
-            'created_at': p.created_at.isoformat(),
-            'updated_at': p.updated_at.isoformat()
-        }
-        for p in produtos
-    ]
-    return jsonify(produtos_list), 200
-
 
 # Função Buscar Produto
 @produtos_bp.route('/<int:produto_id>', methods=['GET'])

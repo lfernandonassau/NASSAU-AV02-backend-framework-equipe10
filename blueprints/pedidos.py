@@ -58,13 +58,31 @@ def listar_meus_pedidos():
     except Exception as e:
         return jsonify({'message': f'Erro ao listar pedidos: {e}'}), 500
 
-#3º Rota: Excluir pedido
+#3º Rota: Buscar pedido
+@pedidos_bp.route('/<int:pedido_id>', methods=['GET'])
+@login_required
+def buscar_pedido(pedido_id):
+
+    pedido = Pedido.query.filter_by(id=pedido_id, user_id=current_user.id).filter(Pedido.deleted_at.is_(None)).first()
+    
+    if not pedido:
+        return jsonify({'message': 'Pedido não encontrado ou acesso negado.'}), 404
+        
+    pedido_data = {
+        'pedido_id': pedido.id,
+        'status': pedido.status,
+        'valor_total': pedido.valor_total,
+        'data_pedido': pedido.data_pedido.isoformat(),
+        'cliente_id': pedido.user_id,
+    }
+    return jsonify(pedido_data), 200
+
+#4º Rota: Excluir pedido
 @pedidos_bp.route('/<int:pedido_id>', methods=['DELETE'])
 @login_required
 def excluir_pedido(pedido_id):
     
     try:
-        # Busca o pedido, não importa se está deletado ou não para poder restaurá-lo, mas vamos focar na exclusão
         pedido = Pedido.query.get(pedido_id)
 
         if not pedido:

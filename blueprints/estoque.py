@@ -121,26 +121,3 @@ def atualizar_estoque(produto_id):
         db.session.rollback()
         return jsonify({'message': f'Erro ao atualizar estoque: {e}'}), 500
 
-#5º Rota: Deletar estoque.
-@estoque_bp.route('/<int:produto_id>', methods=['DELETE'])
-@login_required
-def deletar_estoque(produto_id):
-    
-
-    estoque = Estoque.query.filter(
-        Estoque.produto_id == produto_id,
-        Estoque.deleted_at == None
-    ).first()
-
-    if not estoque:
-        return jsonify({'message': f'Estoque para o Produto ID {produto_id} não encontrado para exclusão.'}), 404
-        
-    try:
-        # Usa o Soft Delete
-        estoque.soft_delete() 
-        
-        return jsonify({'message': f'Estoque do Produto ID {produto_id} excluído logicamente.'}), 200
-        
-    except Exception as e:
-        db.session.rollback() # type: ignore
-        return jsonify({'message': f'Erro ao deletar estoque: {e}'}), 500
