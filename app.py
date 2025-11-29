@@ -54,13 +54,11 @@ def teste_db():
         return jsonify({"status": "erro", "mensagem": str(e)}), 500
 
 
-
 try:
    from blueprints.auth_control import auth_bp
    from blueprints.produtos_controller import produtos_bp
    from blueprints.pedidos import pedidos_bp
    from blueprints.estoque import estoque_bp
-
 
 
 except ImportError as e:
