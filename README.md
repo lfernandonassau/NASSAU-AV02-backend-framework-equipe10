@@ -51,6 +51,20 @@ Este projeto é uma aplicação **Back-End em Python usando Flask**, criada para
 - preço  
 - loja_id (chave estrangeira)
 
+### 📦 Pedido
+- id
+- data
+- status
+- valor_total
+
+### 🏬 Estoque
+- id
+- produto_id
+- quantidade
+- localizacao
+- created_at
+- updated_at
+
 ---
 
 ## 🗃️ Banco de Dados
