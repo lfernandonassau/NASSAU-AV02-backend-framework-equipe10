@@ -100,4 +100,14 @@ A API iniciará em:
 
 http://127.0.0.1:5000
 
+Com o servidor rodando, você pode testar se a API está acessível:
+
+Acesso no Navegador:
+Abra http://127.0.0.1:5000/
+
+Teste de Conexão com DB:
+Abra http://127.0.0.1:5000/teste-db
+
+O status deve ser ok. A partir deste ponto, você pode usar ferramentas como Postman ou Bruno para interagir com os endpoints de Autenticação, Produtos, Pedidos e Estoque.
+
 
