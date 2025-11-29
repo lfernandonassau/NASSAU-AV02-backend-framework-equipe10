@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required 
 from datetime import datetime
-# Este é o caminho correto para subir um nível (..) e acessar a raiz
 from extensions import db 
 from models import Estoque
 
@@ -91,7 +90,6 @@ def buscar_estoque(produto_id):
 
 def atualizar_estoque(produto_id):
 
-    # Busca pelo produto_id (e verifica soft delete)
     estoque = Estoque.query.filter(
         Estoque.produto_id == produto_id,
         Estoque.deleted_at == None

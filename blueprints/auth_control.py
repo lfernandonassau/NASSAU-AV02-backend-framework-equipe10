@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_login import login_user, logout_user, login_required
 from extensions import db
 from models import Usuario
+from Crypto.Hash import SHA256
 
 
 
@@ -10,7 +11,6 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 #1º Rota: Registro 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    from Crypto.Hash import SHA256 # Para hashing da senha.
 
     data = request.get_json()
     
@@ -50,7 +50,6 @@ def register():
 #2º Rota: Login     
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    from Crypto.Hash import SHA256 # Para hashing da senha.
 
     data = request.get_json()
 

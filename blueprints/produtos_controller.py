@@ -15,17 +15,16 @@ produtos_bp = Blueprint('produtos', __name__, url_prefix='/produtos')
 @produtos_bp.route('/', methods=['POST'])
 @login_required # Recomendado: Apenas usuários autenticados podem criar produtos
 def criar_produtos():
-    """Cria um novo produto, associando-o a uma loja existente."""
+    
     data = request.get_json()
     
-    # 1. Validação de Dados OBRIGATÓRIOS
-    # Agora requer 'loja_id'
+    
     if not data or 'nome' not in data or 'preco' not in data or 'loja_id' not in data:
         return jsonify({'message': 'Dados incompletos. Nome, Preço e ID da Loja são obrigatórios.'}), 400
 
     loja_id = data.get('loja_id')
     
-    # 2. Validação da Loja
+    
     loja = Loja.query.filter_by(id=loja_id).first()
     if not loja:
         return jsonify({'message': f'Loja com ID {loja_id} não encontrada.'}), 404
@@ -60,9 +59,7 @@ def criar_produtos():
 # Função Listar Produtos
 @produtos_bp.route('/', methods=['GET'])
 def listar_todos_produtos():
-    """Lista todos os produtos que não foram deletados (soft delete)."""
     
-    # 💡 MELHORIA: Usar .is_(None) é mais legível e idiomático com SQLAlchemy
     produtos = Produto.query.filter(Produto.deleted_at.is_(None)).all()
     
     lista = []
@@ -81,7 +78,6 @@ def listar_todos_produtos():
 @produtos_bp.route('/loja/<int:loja_id>', methods=['GET'])
 @login_required
 def listar_produtos_por_loja(loja_id): 
-    """Lista todos os produtos de uma loja específica."""
 
     if current_user.id != loja_id:
         return jsonify({'message': 'Acesso negado. Você só pode visualizar produtos da sua própria loja.'}), 403
@@ -114,7 +110,6 @@ def listar_produtos_por_loja(loja_id):
 # Função Buscar Produto
 @produtos_bp.route('/<int:produto_id>', methods=['GET'])
 def buscar_produto(produto_id):
-    """Busca um produto específico pelo ID, ignorando deletados."""
     
     produto = Produto.query.filter(
         Produto.id == produto_id,
@@ -138,9 +133,8 @@ def buscar_produto(produto_id):
 
 # Função Atualizar Produto
 @produtos_bp.route('/<int:produto_id>', methods=['PUT'])
-@login_required # Recomendado: Apenas usuários autenticados podem atualizar produtos
+@login_required 
 def atualizar_produto(produto_id):
-    """Atualiza as informações de um produto existente."""
     
     produto = Produto.query.filter(
         Produto.id == produto_id,
@@ -162,7 +156,6 @@ def atualizar_produto(produto_id):
             produto.nome = data['nome']
         
         if 'preco' in data:
-            # Garante que o preço seja um float válido
             try:
                 produto.preco = float(data['preco'])
             except ValueError:
@@ -171,7 +164,6 @@ def atualizar_produto(produto_id):
         if 'descricao' in data:
             produto.descricao = data['descricao']
 
-        # Obs: Não permitimos alterar o loja_id, pois geralmente é uma chave imutável.
 
         db.session.commit()
 
@@ -186,9 +178,9 @@ def atualizar_produto(produto_id):
 
 # Função Deletar Produto (Soft Delete) 
 @produtos_bp.route('/<int:produto_id>', methods=['DELETE'])
-@login_required # Recomendado: Apenas usuários autenticados podem deletar produtos
+@login_required 
 def deletar_produtos(produto_id):
-    """Marca um produto como deletado (soft delete)."""
+    
     
     produto = Produto.query.filter(
         Produto.id == produto_id,
@@ -199,10 +191,8 @@ def deletar_produtos(produto_id):
         return jsonify({'message': 'Produto não encontrado para exclusão'}), 404
 
     try:
-        # Usa o método soft_delete definido na classe Base do modelo
         produto.soft_delete() 
-        # Não é necessário um db.session.commit() após soft_delete se o método 
-        # já o faz, mas o Base modelo que definimos acima não faz o commit internamente.
+        
         db.session.commit()
         
         return jsonify({'message': f'Produto ID {produto.id} excluído (Soft Delete).'}), 200

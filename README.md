@@ -9,6 +9,9 @@ Este projeto é uma aplicação **Back-End em Python usando Flask**, criada para
 
 ---
 
+## Membros do Grupo 10
+#### Daniel Manoel Santos da Silva - 01841723
+
 ## 🚀 Tecnologias Utilizadas
 
 - Python 3.x  
@@ -16,9 +19,8 @@ Este projeto é uma aplicação **Back-End em Python usando Flask**, criada para
 - Flask SQLAlchemy  
 - Flask Login  
 - SQLite  
-- Werkzeug (hash de senhas)
 
----
+
 
 
 ---
@@ -55,7 +57,33 @@ Este projeto é uma aplicação **Back-End em Python usando Flask**, criada para
 
 Configurado em:
 
-```python
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
+
+
+---
+
+ ⚙️ Instalação e Execução
+
+ 1️⃣ Criar ambiente virtual
+
+**Windows:**
+
+python -m venv venv
+venv\Scripts\activate
+
+2️⃣ Instalar dependências
+
+Após ativar o ambiente:
+
+pip install -r requirements.txt
+
+3️⃣ Rodar a aplicação
+python app.py
+
+
+A API iniciará em:
+
+http://127.0.0.1:5000
 
 
